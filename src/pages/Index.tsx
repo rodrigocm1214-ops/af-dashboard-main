@@ -165,7 +165,7 @@ const Index = () => {
                   </div>
                   <ProjectComparisonDashboard projectName={activeProject.name} periodsData={allPeriodsData} availablePeriods={availablePeriods} />
                 </div> : <div className="space-y-6">
-                  <Dashboard projectName={activeProject.name} data={data} selectedPeriod={selectedPeriod} availablePeriods={availablePeriods} onPeriodChange={setSelectedPeriod} onUploadClick={() => setShowUploadModal(true)} onManualSaleClick={() => setShowManualSaleModal(true)} onManualSalesHistoryClick={() => setShowManualSalesHistoryModal(true)} onSummaryClick={() => setShowSummaryModal(true)} onComparisonClick={() => setShowComparisonDashboard(true)} onClearData={handleClearData} getDataForPeriod={getDataForPeriod} />
+                  <Dashboard projectName={activeProject.name} data={data} selectedPeriod={selectedPeriod} availablePeriods={availablePeriods} onPeriodChange={setSelectedPeriod} onUploadClick={() => setShowUploadModal(true)} onManualSaleClick={() => setShowManualSaleModal(true)} onManualSalesHistoryClick={() => setShowManualSalesHistoryModal(true)} onSummaryClick={() => setShowSummaryModal(true)} onComparisonClick={() => setShowComparisonDashboard(true)} onClearData={handleClearData} getDataForPeriod={getDataForPeriod} projectId={activeProject.id} />
                   
                   {/* Seção de Repasse do Projeto */}
                   {data.kpis.totalRevenueNet > 0 && (

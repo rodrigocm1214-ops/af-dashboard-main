@@ -10,11 +10,14 @@ import {
   Trash2,
   Plus,
   FileText,
-  BarChart3
+  BarChart3,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { useTrendAnalysis } from '@/hooks/useTrendAnalysis';
 import { KPICard } from './KPICard';
 import { EditableRepasseResumo } from './EditableRepasseResumo';
+import { IntegrationsModal } from './IntegrationsModal';
+import { IntegrationStatusCard } from './IntegrationStatusCard';
 import { DashboardData } from '@/types/project';
 import { formatCurrency, formatNumber } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
@@ -58,6 +61,7 @@ interface DashboardProps {
   onComparisonClick: () => void;
   onClearData: (type: 'period' | 'all') => void;
   getDataForPeriod: (period: string) => DashboardData;
+  projectId?: string;
 }
 
 export function Dashboard({ 
@@ -72,9 +76,11 @@ export function Dashboard({
   onSummaryClick,
   onComparisonClick,
   onClearData,
-  getDataForPeriod
+  getDataForPeriod,
+  projectId
 }: DashboardProps) {
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const [showIntegrationsModal, setShowIntegrationsModal] = useState(false);
 
   // Calculate trends using the new hook
   const trends = useTrendAnalysis({
@@ -99,6 +105,14 @@ export function Dashboard({
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6 bg-gradient-surface min-h-screen">
       {/* Repasse Resumo */}
       <EditableRepasseResumo />
+      
+      {/* Integration Status */}
+      {projectId && (
+        <IntegrationStatusCard 
+          projectId={projectId} 
+          onOpenIntegrations={() => setShowIntegrationsModal(true)} 
+        />
+      )}
       
       {/* Header */}
       <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
@@ -159,6 +173,13 @@ export function Dashboard({
               <BarChart3 className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Comparar</span>
             </Button>
+
+            {projectId && (
+              <Button variant="outline" size="sm" onClick={() => setShowIntegrationsModal(true)} className="flex-1 sm:flex-none">
+                <SettingsIcon className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Integrações</span>
+              </Button>
+            )}
 
             <Button 
               variant="outline" 
@@ -341,6 +362,16 @@ export function Dashboard({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Integrations Modal */}
+      {projectId && (
+        <IntegrationsModal
+          open={showIntegrationsModal}
+          onOpenChange={setShowIntegrationsModal}
+          projectId={projectId}
+          projectName={projectName}
+        />
+      )}
     </div>
   );
 }
