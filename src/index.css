@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Minimal Color System - Professional & Clean */
+    --background: 0 0% 100%;
+    --foreground: 220 9% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 9% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 9% 15%;
+    
+    /* Neutral Primary Colors */
+    --primary: 220 13% 18%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 3% 96%;
+    --secondary-foreground: 220 9% 15%;
+    --muted: 220 5% 96%;
+    --muted-foreground: 220 5% 46%;
+    --accent: 220 13% 91%;
+    --accent-foreground: 220 9% 15%;
+    
+    /* Status Colors - Subtle */
+    --success: 142 52% 45%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 84% 48%;
+    --warning-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --info: 220 39% 55%;
+    --info-foreground: 0 0% 98%;
+    --danger: 0 72% 51%;
+    --danger-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 13% 18%;
+    
+    /* Charts - Minimal Palette */
+    --chart-1: 220 39% 55%;
+    --chart-2: 142 52% 45%;
+    --chart-3: 38 84% 48%;
+    --chart-4: 262 52% 47%;
+    --chart-5: 0 72% 51%;
+    
+    /* Project Colors */
+    --project-color-1: 220 39% 55%;
+    --project-color-2: 142 52% 45%;
+    --project-color-3: 38 84% 48%;
+    --project-color-4: 262 52% 47%;
+    --project-color-5: 0 72% 51%;
+    --project-color-6: 330 80% 58%;
+    --project-color-7: 180 40% 50%;
+    --project-color-8: 25 80% 58%;
+    
+    --radius: 6px;
+    
+    /* Clean Surface */
+    --surface: 220 9% 98%;
+    --surface-secondary: 220 13% 96%;
+    
+    /* Sidebar Colors */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 27% 4%;
+    --foreground: 220 9% 98%;
+    --card: 220 27% 4%;
+    --card-foreground: 220 9% 98%;
+    --popover: 220 27% 4%;
+    --popover-foreground: 220 9% 98%;
+    --primary: 220 9% 98%;
+    --primary-foreground: 220 27% 4%;
+    --secondary: 220 17% 11%;
+    --secondary-foreground: 220 9% 98%;
+    --muted: 220 17% 11%;
+    --muted-foreground: 220 9% 64%;
+    --accent: 220 17% 11%;
+    --accent-foreground: 220 9% 98%;
+    --success: 142 52% 55%;
+    --success-foreground: 0 0% 0%;
+    --warning: 38 84% 58%;
+    --warning-foreground: 0 0% 0%;
+    --destructive: 0 72% 61%;
+    --destructive-foreground: 220 9% 98%;
+    --info: 220 39% 65%;
+    --info-foreground: 220 27% 4%;
+    --danger: 0 72% 61%;
+    --danger-foreground: 220 9% 98%;
+    --border: 220 17% 11%;
+    --input: 220 17% 11%;
+    --ring: 220 9% 98%;
+    --chart-1: 220 39% 65%;
+    --chart-2: 142 52% 55%;
+    --chart-3: 38 84% 58%;
+    --chart-4: 262 52% 57%;
+    --chart-5: 0 72% 61%;
+    
+    /* Project Colors - Dark Mode */
+    --project-color-1: 220 39% 65%;
+    --project-color-2: 142 52% 55%;
+    --project-color-3: 38 84% 58%;
+    --project-color-4: 262 52% 57%;
+    --project-color-5: 0 72% 61%;
+    --project-color-6: 330 80% 68%;
+    --project-color-7: 180 40% 60%;
+    --project-color-8: 25 80% 68%;
+    
+    --surface: 220 27% 6%;
+    --surface-secondary: 220 17% 8%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-surface {
+    background: linear-gradient(135deg, hsl(var(--surface)), hsl(var(--surface-secondary)));
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary)/0.9));
+  }
+  .shadow-card {
+    box-shadow: 0 2px 8px -2px hsl(var(--primary)/0.1), 0 4px 16px -4px hsl(var(--primary)/0.08);
+  }
+  .surface-accent {
+    background-color: hsl(var(--surface-secondary));
+  }
+}
