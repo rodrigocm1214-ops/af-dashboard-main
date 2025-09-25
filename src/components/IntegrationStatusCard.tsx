@@ -10,7 +10,8 @@ import {
   AlertCircle, 
   CheckCircle,
   Clock,
-  Settings
+  Settings,
+  Plus
 } from 'lucide-react';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { formatDistanceToNow } from 'date-fns';
