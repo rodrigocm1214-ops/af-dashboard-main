@@ -232,34 +232,56 @@ export function IntegrationsModal({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Configure esta URL nas configurações de webhook da {platform === 'hotmart' ? 'Hotmart' : 'Kiwify'}
+          Configure esta URL nas configurações de webhook da {platform === 'hotmart' ? 'Hotmart' : 'Kiwify'}.
+          {platform === 'hotmart' && (
+            <span className="block mt-1 text-warning">
+              ⚠️ Certifique-se de que a URL está acessível publicamente. URLs localhost não funcionam.
+            </span>
+          )}
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="webhookSecret">Webhook Secret *</Label>
-        <div className="relative">
-          <Input
-            id="webhookSecret"
-            type={showCredentials.webhookSecret ? "text" : "password"}
-            value={formData.credentials.webhookSecret || ''}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              credentials: { ...prev.credentials, webhookSecret: e.target.value }
-            }))}
-            placeholder="Chave secreta do webhook"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="absolute right-2 top-1/2 -translate-y-1/2"
-            onClick={() => setShowCredentials(prev => ({ ...prev, webhookSecret: !prev.webhookSecret }))}
-          >
-            {showCredentials.webhookSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </Button>
+      {platform === 'kiwify' && (
+        <div className="space-y-2">
+          <Label htmlFor="webhookSecret">Webhook Secret *</Label>
+          <div className="relative">
+            <Input
+              id="webhookSecret"
+              type={showCredentials.webhookSecret ? "text" : "password"}
+              value={formData.credentials.webhookSecret || ''}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                credentials: { ...prev.credentials, webhookSecret: e.target.value }
+              }))}
+              placeholder="Chave secreta do webhook"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              onClick={() => setShowCredentials(prev => ({ ...prev, webhookSecret: !prev.webhookSecret }))}
+            >
+              {showCredentials.webhookSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Chave secreta fornecida pela Kiwify para validação do webhook
+          </p>
         </div>
-      </div>
+      )}
+
+      {platform === 'hotmart' && (
+        <div className="bg-blue-50 p-3 rounded-lg">
+          <h5 className="font-medium text-sm text-blue-900 mb-2">Configuração na Hotmart</h5>
+          <div className="text-xs text-blue-800 space-y-1">
+            <p>1. Acesse: Hotmart > Ferramentas > Webhook</p>
+            <p>2. Cole a URL do webhook acima</p>
+            <p>3. Selecione os eventos: PURCHASE_COMPLETE, PURCHASE_APPROVED</p>
+            <p>4. A Hotmart não usa webhook secret - apenas configure a URL</p>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="webhookEvents">Eventos para Processar</Label>
@@ -336,7 +358,11 @@ export function IntegrationsModal({
                     </Button>
                     <Button 
                       onClick={editingIntegration ? handleUpdateIntegration : handleCreateIntegration}
-                      disabled={!formData.credentials.accessToken && !formData.credentials.webhookSecret}
+                      disabled={
+                        formData.type === 'meta_ads' ? !formData.credentials.accessToken :
+                        formData.type === 'kiwify_webhook' ? !formData.credentials.webhookSecret :
+                        false // Hotmart não precisa de webhook secret
+                      }
                     >
                       {editingIntegration ? 'Atualizar' : 'Criar'} Integração
                     </Button>

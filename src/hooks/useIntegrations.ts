@@ -199,7 +199,8 @@ export const useIntegrations = (projectId?: string) => {
 
   const getWebhookUrl = (platform: 'hotmart' | 'kiwify') => {
     if (!projectId) return '';
-    return `${supabase.supabaseUrl}/functions/v1/webhook-handler?platform=${platform}&project_id=${projectId}`;
+    const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+    return `${baseUrl}/functions/v1/webhook-handler?platform=${platform}&project_id=${projectId}`;
   };
 
   return {
