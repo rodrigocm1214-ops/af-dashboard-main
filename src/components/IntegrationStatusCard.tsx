@@ -2,17 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Facebook, 
-  ShoppingCart, 
-  Zap, 
-  RefreshCw, 
-  AlertCircle, 
-  CheckCircle,
-  Clock,
-  Settings,
-  Plus
-} from 'lucide-react';
+import { Facebook, ShoppingCart, Zap, RefreshCw, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Clock, Settings, Plus } from 'lucide-react';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
