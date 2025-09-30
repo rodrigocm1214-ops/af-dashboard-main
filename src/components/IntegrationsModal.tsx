@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Settings, Plus, Trash2, RefreshCw, Copy, Eye, EyeOff, Facebook, ShoppingCart, Zap, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Settings, Plus, Trash2, RefreshCw, Copy, Eye, EyeOff, Facebook, ShoppingCart, Zap, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Clock } from 'lucide-react';
 import { useIntegrations } from '@/hooks/useIntegrations';
 import { ProjectIntegration } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
