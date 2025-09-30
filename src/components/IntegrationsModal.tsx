@@ -261,7 +261,7 @@ export function IntegrationsModal({
         <div className="bg-blue-50 p-3 rounded-lg">
           <h5 className="font-medium text-sm text-blue-900 mb-2">Configuração na Hotmart</h5>
           <div className="text-xs text-blue-800 space-y-1">
-            <p>1. Acesse: Hotmart > Ferramentas > Webhook</p>
+            <p>1. Acesse: Hotmart &gt; Ferramentas &gt; Webhook</p>
             <p>2. Cole a URL do webhook acima</p>
             <p>3. Selecione os eventos: PURCHASE_COMPLETE, PURCHASE_APPROVED</p>
             <p>4. A Hotmart não usa webhook secret - apenas configure a URL</p>
