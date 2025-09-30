@@ -65,8 +65,11 @@ export const useIntegrations = (projectId?: string) => {
     if (!projectId) throw new Error('Project ID is required');
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('Auth error:', userError);
+        throw new Error('Usuário não autenticado. Faça login novamente.');
+      }
 
       const { data, error } = await supabase
         .from('project_integrations')
@@ -78,7 +81,10 @@ export const useIntegrations = (projectId?: string) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw new Error(`Erro ao criar integração: ${error.message}`);
+      }
 
       await loadIntegrations();
       
@@ -92,7 +98,7 @@ export const useIntegrations = (projectId?: string) => {
       console.error('Error creating integration:', error);
       toast({
         title: "Erro ao criar integração",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Erro desconhecido ao criar integração',
         variant: "destructive"
       });
       throw error;
