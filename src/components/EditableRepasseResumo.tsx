@@ -24,6 +24,10 @@ interface EditableSettings {
   participation: number; // %
 }
 
+interface ProjectSettings {
+  [projectId: string]: EditableSettings;
+}
+
 interface EditableRepasseResumoProps {
   projectId?: string; // Se fornecido, filtra apenas este projeto
   showTitle?: boolean; // Se deve mostrar o título
@@ -37,10 +41,11 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
   const [projectsSummary, setProjectsSummary] = useState<ProjectSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editableSettings, setEditableSettings] = useState<EditableSettings>({
-    platformTax: 6, // 6%
+  const [projectSettings, setProjectSettings] = useState<ProjectSettings>({});
+  const [globalSettings, setGlobalSettings] = useState<EditableSettings>({
+    platformTax: 6,
     tax: 0,
-    participation: 100 // 100%
+    participation: 100
   });
 
   useEffect(() => {
@@ -55,24 +60,52 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
   }, [selectedPeriod, projects, projectId]); // Adiciona projectId como dependência
 
   const loadSettings = () => {
-    const stored = localStorage.getItem('repasse-settings');
-    if (stored) {
+    // Carrega configurações globais
+    const globalStored = localStorage.getItem('repasse-global-settings');
+    if (globalStored) {
       try {
-        const settings = JSON.parse(stored);
-        setEditableSettings(settings);
+        const settings = JSON.parse(globalStored);
+        setGlobalSettings(settings);
       } catch (error) {
-        console.error('Error loading settings:', error);
+        console.error('Error loading global settings:', error);
+      }
+    }
+    
+    // Carrega configurações por projeto
+    const projectStored = localStorage.getItem('repasse-project-settings');
+    if (projectStored) {
+      try {
+        const settings = JSON.parse(projectStored);
+        setProjectSettings(settings);
+      } catch (error) {
+        console.error('Error loading project settings:', error);
       }
     }
   };
 
   const saveSettings = () => {
-    localStorage.setItem('repasse-settings', JSON.stringify(editableSettings));
+    // Salva configurações globais
+    localStorage.setItem('repasse-global-settings', JSON.stringify(globalSettings));
+    
+    // Salva configurações por projeto
+    localStorage.setItem('repasse-project-settings', JSON.stringify(projectSettings));
+    
     setIsEditing(false);
     toast({
       title: "Configurações salvas",
       description: "As configurações foram atualizadas com sucesso.",
     });
+  };
+
+  const getProjectSettings = (projectId: string): EditableSettings => {
+    return projectSettings[projectId] || globalSettings;
+  };
+
+  const updateProjectSettings = (projectId: string, settings: Partial<EditableSettings>) => {
+    setProjectSettings(prev => ({
+      ...prev,
+      [projectId]: { ...getProjectSettings(projectId), ...settings }
+    }));
   };
 
   const loadAvailablePeriods = () => {
@@ -165,14 +198,24 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
 
   const calculatePartnershipProfit = (data: DashboardData) => {
     const grossProfit = data.kpis.profit; // totalRevenueNet - totalInvestment
-    const platformTax = data.kpis.totalRevenueNet * (editableSettings.platformTax / 100);
-    const tax = grossProfit * (editableSettings.tax / 100);
-    const participation = editableSettings.participation / 100;
+    const settings = projectId ? getProjectSettings(projectId) : globalSettings;
+    const platformTax = data.kpis.totalRevenueNet * (settings.platformTax / 100);
+    const tax = grossProfit * (settings.tax / 100);
+    const participation = settings.participation / 100;
+    return (grossProfit - platformTax - tax) * participation;
+  };
+
+  const calculatePartnershipProfitForProject = (data: DashboardData, projectId: string) => {
+    const grossProfit = data.kpis.profit;
+    const settings = getProjectSettings(projectId);
+    const platformTax = data.kpis.totalRevenueNet * (settings.platformTax / 100);
+    const tax = grossProfit * (settings.tax / 100);
+    const participation = settings.participation / 100;
     return (grossProfit - platformTax - tax) * participation;
   };
 
   const totalPartnershipProfit = projectsSummary.reduce((sum, project) => 
-    sum + calculatePartnershipProfit(project.data), 0
+    sum + calculatePartnershipProfitForProject(project.data, project.projectId), 0
   );
 
   if (availablePeriods.length === 0) {
@@ -257,7 +300,7 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
             ) : (
               <>
                 <Edit3 className="h-4 w-4 mr-2" />
-                Editar % do Projeto
+                {projectId ? 'Editar % do Projeto' : 'Editar % dos Projetos'}
               </>
             )}
           </Button>
@@ -267,57 +310,166 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
       {/* Configurações Editáveis */}
       {isEditing && (
         <Card className="p-4 bg-white shadow-card">
-          <div className="space-y-4">
-            <h3 className="font-medium text-foreground">Configurações de Cálculo</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="platformTax">Taxa de Plataforma (%)</Label>
-                <Input
-                  id="platformTax"
-                  type="number"
-                  step="0.1"
-                  value={editableSettings.platformTax}
-                  onChange={(e) => setEditableSettings(prev => ({
-                    ...prev,
-                    platformTax: parseFloat(e.target.value) || 0
-                  }))}
-                />
+          {projectId ? (
+            // Configurações para projeto específico
+            <div className="space-y-4">
+              <h3 className="font-medium text-foreground">Configurações do Projeto</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="platformTax">Taxa de Plataforma (%)</Label>
+                  <Input
+                    id="platformTax"
+                    type="number"
+                    step="0.1"
+                    value={getProjectSettings(projectId).platformTax}
+                    onChange={(e) => updateProjectSettings(projectId, {
+                      platformTax: parseFloat(e.target.value) || 0
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tax">Imposto (%)</Label>
+                  <Input
+                    id="tax"
+                    type="number"
+                    step="0.1"
+                    value={getProjectSettings(projectId).tax}
+                    onChange={(e) => updateProjectSettings(projectId, {
+                      tax: parseFloat(e.target.value) || 0
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="participation">% de Participação</Label>
+                  <Input
+                    id="participation"
+                    type="number"
+                    step="0.1"
+                    max="100"
+                    value={getProjectSettings(projectId).participation}
+                    onChange={(e) => updateProjectSettings(projectId, {
+                      participation: parseFloat(e.target.value) || 0
+                    })}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tax">Imposto (%)</Label>
-                <Input
-                  id="tax"
-                  type="number"
-                  step="0.1"
-                  value={editableSettings.tax}
-                  onChange={(e) => setEditableSettings(prev => ({
-                    ...prev,
-                    tax: parseFloat(e.target.value) || 0
-                  }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="participation">% de Participação</Label>
-                <Input
-                  id="participation"
-                  type="number"
-                  step="0.1"
-                  max="100"
-                  value={editableSettings.participation}
-                  onChange={(e) => setEditableSettings(prev => ({
-                    ...prev,
-                    participation: parseFloat(e.target.value) || 0
-                  }))}
-                />
+              <div className="flex justify-end">
+                <Button onClick={saveSettings} size="sm">
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Configurações
+                </Button>
               </div>
             </div>
-            <div className="flex justify-end">
-              <Button onClick={saveSettings} size="sm">
-                <Save className="h-4 w-4 mr-2" />
-                Salvar Configurações
-              </Button>
+          ) : (
+            // Configurações globais para múltiplos projetos
+            <div className="space-y-4">
+              <h3 className="font-medium text-foreground">Configurações Globais</h3>
+              <p className="text-sm text-muted-foreground">
+                Estas configurações serão aplicadas a todos os projetos que não possuem configurações específicas.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="globalPlatformTax">Taxa de Plataforma Padrão (%)</Label>
+                  <Input
+                    id="globalPlatformTax"
+                    type="number"
+                    step="0.1"
+                    value={globalSettings.platformTax}
+                    onChange={(e) => setGlobalSettings(prev => ({
+                      ...prev,
+                      platformTax: parseFloat(e.target.value) || 0
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="globalTax">Imposto Padrão (%)</Label>
+                  <Input
+                    id="globalTax"
+                    type="number"
+                    step="0.1"
+                    value={globalSettings.tax}
+                    onChange={(e) => setGlobalSettings(prev => ({
+                      ...prev,
+                      tax: parseFloat(e.target.value) || 0
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="globalParticipation">% de Participação Padrão</Label>
+                  <Input
+                    id="globalParticipation"
+                    type="number"
+                    step="0.1"
+                    max="100"
+                    value={globalSettings.participation}
+                    onChange={(e) => setGlobalSettings(prev => ({
+                      ...prev,
+                      participation: parseFloat(e.target.value) || 0
+                    }))}
+                  />
+                </div>
+              </div>
+              
+              {/* Configurações individuais por projeto */}
+              <div className="space-y-4 border-t pt-4">
+                <h4 className="font-medium text-foreground">Configurações por Projeto</h4>
+                {projectsSummary.map(project => {
+                  const settings = getProjectSettings(project.projectId);
+                  return (
+                    <div key={project.projectId} className="p-3 border rounded-lg space-y-3">
+                      <h5 className="font-medium text-sm">{project.projectName}</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Taxa Plataforma (%)</Label>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            value={settings.platformTax}
+                            onChange={(e) => updateProjectSettings(project.projectId, {
+                              platformTax: parseFloat(e.target.value) || 0
+                            })}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Imposto (%)</Label>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            value={settings.tax}
+                            onChange={(e) => updateProjectSettings(project.projectId, {
+                              tax: parseFloat(e.target.value) || 0
+                            })}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">% Participação</Label>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            max="100"
+                            value={settings.participation}
+                            onChange={(e) => updateProjectSettings(project.projectId, {
+                              participation: parseFloat(e.target.value) || 0
+                            })}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="flex justify-end">
+                <Button onClick={saveSettings} size="sm">
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Configurações
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </Card>
       )}
 
@@ -338,9 +490,10 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
       ) : (
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {projectsSummary.map(project => {
-            const partnershipProfit = calculatePartnershipProfit(project.data);
-            const platformTax = project.data.kpis.totalRevenueNet * (editableSettings.platformTax / 100);
-            const tax = project.data.kpis.profit * (editableSettings.tax / 100);
+            const partnershipProfit = calculatePartnershipProfitForProject(project.data, project.projectId);
+            const settings = getProjectSettings(project.projectId);
+            const platformTax = project.data.kpis.totalRevenueNet * (settings.platformTax / 100);
+            const tax = project.data.kpis.profit * (settings.tax / 100);
             
             return (
               <Card key={project.projectId} className="p-4 bg-white shadow-card">
@@ -364,16 +517,16 @@ export function EditableRepasseResumo({ projectId, showTitle = true }: EditableR
                       <span className="font-medium">{formatCurrency(project.data.kpis.profit)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Taxa de Plataforma ({editableSettings.platformTax}%):</span>
+                      <span className="text-muted-foreground">Taxa de Plataforma ({settings.platformTax}%):</span>
                       <span className="font-medium">{formatCurrency(platformTax)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Imposto ({editableSettings.tax}%):</span>
+                      <span className="text-muted-foreground">Imposto ({settings.tax}%):</span>
                       <span className="font-medium">{formatCurrency(tax)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">% Participação:</span>
-                      <span className="text-xs text-muted-foreground">{editableSettings.participation}%</span>
+                      <span className="text-xs text-muted-foreground">{settings.participation}%</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t">
                       <span className="text-muted-foreground font-medium">Lucro líquido:</span>
