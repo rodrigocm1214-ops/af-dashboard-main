@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Download, Calendar, TrendingUp, DollarSign, Target, PiggyBank, Filter, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Download, Calendar, TrendingUp, DollarSign, Target, PiggyBank, Filter, ChartBar as BarChart3 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { formatCurrency, formatNumber } from '@/lib/mockData';
 import { useProjectsContext } from '@/contexts/ProjectsContext';
