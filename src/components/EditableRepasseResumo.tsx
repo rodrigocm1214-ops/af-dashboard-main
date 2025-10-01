@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Calendar, PiggyBank, Edit3, Save, X } from 'lucide-react';
+import { Calendar, PiggyBank, CreditCard as Edit3, Save, X } from 'lucide-react';
 import { formatCurrency } from '@/lib/mockData';
 import { useProjects } from '@/hooks/useProjects';
 import { calculateKPIs } from '@/lib/kpiCalculator';
