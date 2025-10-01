@@ -66,9 +66,13 @@ export const useIntegrations = (projectId?: string) => {
 
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
+      if (userError) {
         console.error('Auth error:', userError);
-        throw new Error('Usuário não autenticado. Faça login novamente.');
+        throw new Error('Erro de autenticação. Tente fazer login novamente.');
+      }
+      
+      if (!user) {
+        throw new Error('Usuário não autenticado. Faça login para continuar.');
       }
 
       const { data, error } = await supabase
