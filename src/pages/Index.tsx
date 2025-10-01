@@ -17,6 +17,7 @@ import { useProjectsContext } from "@/contexts/ProjectsContext";
 import { useProjectData } from "@/hooks/useProjectData";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/UserMenu";
 const Index = () => {
   const navigate = useNavigate();
   const {
@@ -147,6 +148,7 @@ const Index = () => {
               {activeProject && data.kpis.totalRevenueNet > 0 && <Button variant="outline" size="sm" onClick={() => setShowPublishModal(true)}>
                   Publicar Relatório
                 </Button>}
+              <UserMenu />
               <h2 className="text-sm font-medium text-muted-foreground">
                 A-FONTE Dashboard
               </h2>

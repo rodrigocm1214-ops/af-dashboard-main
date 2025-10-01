@@ -16,6 +16,7 @@ import { calculateKPIs } from '@/lib/kpiCalculator';
 import { DashboardData } from '@/types/project';
 import { useToast } from '@/hooks/use-toast';
 import { EditableRepasseResumo } from '@/components/EditableRepasseResumo';
+import { UserMenu } from '@/components/UserMenu';
 
 /**
  * DASHBOARD COMPARATIVO ISOLADO
@@ -397,6 +398,7 @@ const ComparativoGeral = () => {
                 <span>Voltar</span>
               </Button>
             </div>
+            <UserMenu />
             <h2 className="text-sm font-medium text-muted-foreground">
               Dashboard Comparativo Geral
             </h2>
