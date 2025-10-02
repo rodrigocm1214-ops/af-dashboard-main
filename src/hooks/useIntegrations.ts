@@ -75,6 +75,12 @@ export const useIntegrations = (projectId?: string) => {
         throw new Error('Usuário não autenticado. Faça login para continuar.');
       }
 
+      // Check if projectId is a valid UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(projectId)) {
+        throw new Error('ID do projeto inválido. Por favor, recrie o projeto para usar o formato correto.');
+      }
+
       const { data, error } = await supabase
         .from('project_integrations')
         .insert({
@@ -87,6 +93,9 @@ export const useIntegrations = (projectId?: string) => {
 
       if (error) {
         console.error('Database error:', error);
+        if (error.code === '22P02') {
+          throw new Error('ID do projeto inválido. Por favor, recrie o projeto para usar o formato correto.');
+        }
         throw new Error(`Erro ao criar integração: ${error.message}`);
       }
 
