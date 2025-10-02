@@ -82,7 +82,7 @@ export const ProjectsProvider: React.FC<{ children: ReactNode }> = ({ children }
       .replace(/^-|-$/g, '');
 
     const newProject: Project = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name,
       slug,
       createdAt: new Date(),
